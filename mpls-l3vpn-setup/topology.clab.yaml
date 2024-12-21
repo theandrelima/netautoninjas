@@ -1,0 +1,61 @@
+name: mpls-l3vpn-setup
+
+topology:
+  nodes:
+    client1:
+      kind: linux
+      image: alpine:latest
+      startup-config: configs/client1.cfg
+      binds:
+        - ./configs/client_setup.sh:/etc/init.d/client_setup.sh
+      group: clients
+    client2:
+      kind: linux
+      image: alpine:latest
+      startup-config: configs/client2.cfg
+      binds:
+        - ./configs/client_setup.sh:/etc/init.d/client_setup.sh
+      group: clients
+    client3:
+      kind: linux
+      image: alpine:latest
+      startup-config: configs/client3.cfg
+      binds:
+        - ./configs/client_setup.sh:/etc/init.d/client_setup.sh
+      group: clients
+    client4:
+      kind: linux
+      image: alpine:latest
+      startup-config: configs/client4.cfg
+      binds:
+        - ./configs/client_setup.sh:/etc/init.d/client_setup.sh
+      group: clients
+    pe_rtr1:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:latest
+      startup-config: configs/pe_rtr1.cfg
+      group: pe_routers
+    pe_rtr2:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:latest
+      startup-config: configs/pe_rtr2.cfg
+      group: pe_routers
+    pe_rtr3:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:latest
+      startup-config: configs/pe_rtr3.cfg
+      group: pe_routers
+    p_rtr1:
+      kind: nokia_srlinux
+      image: ghcr.io/nokia/srlinux:latest
+      startup-config: configs/p_rtr1.cfg
+      group: p_routers
+
+  links:
+    - endpoints: ["client1:eth1", "pe_rtr1:ethernet-1/1/1"]
+    - endpoints: ["client2:eth1", "pe_rtr1:ethernet-1/1/2"]
+    - endpoints: ["client3:eth1", "pe_rtr2:ethernet-1/1/1"]
+    - endpoints: ["client4:eth1", "pe_rtr3:ethernet-1/1/1"]
+    - endpoints: ["pe_rtr1:ethernet-1/1/3", "p_rtr1:ethernet-1/1/1"]
+    - endpoints: ["pe_rtr2:ethernet-1/1/2", "p_rtr1:ethernet-1/1/2"]
+    - endpoints: ["pe_rtr3:ethernet-1/1/2", "p_rtr1:ethernet-1/1/3"]
