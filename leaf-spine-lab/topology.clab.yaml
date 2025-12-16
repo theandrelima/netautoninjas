@@ -1,0 +1,38 @@
+name: leaf-spine-lab
+
+mgmt:
+  network: clab
+  ipv4-subnet: 172.29.163.0/24
+
+topology:
+  nodes:
+    leaf1:
+      kind: ceos
+      image: ceos:4.35.0F
+      startup-config: configs/leaf1.cfg
+      group: leaf
+      mgmt-ipv4: 172.29.163.103
+    leaf2:
+      kind: ceos
+      image: ceos:4.35.0F
+      startup-config: configs/leaf2.cfg
+      group: leaf
+      mgmt-ipv4: 172.29.163.104
+    spine1:
+      kind: ceos
+      image: ceos:4.35.0F
+      startup-config: configs/spine1.cfg
+      group: spine
+      mgmt-ipv4: 172.29.163.101
+    spine2:
+      kind: ceos
+      image: ceos:4.35.0F
+      startup-config: configs/spine2.cfg
+      group: spine
+      mgmt-ipv4: 172.29.163.102
+
+  links:
+    - endpoints: ["leaf1:eth1", "spine1:eth1"]
+    - endpoints: ["leaf1:eth2", "spine2:eth1"]
+    - endpoints: ["leaf2:eth1", "spine1:eth2"]
+    - endpoints: ["leaf2:eth2", "spine2:eth2"]

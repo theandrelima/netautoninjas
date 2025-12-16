@@ -1,0 +1,79 @@
+services:
+  nautobot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nautobot-netauto:latest
+    container_name: nautobot
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - NAUTOBOT_WEBSERVER_SSL=false
+    volumes:
+      - nautobot_media:/opt/nautobot/media
+      - nautobot_static:/opt/nautobot/static
+    networks:
+      - nautobot-net
+      - clab
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  nautobot-worker:
+    image: nautobot-netauto:latest
+    container_name: nautobot-worker
+    restart: unless-stopped
+    command: nautobot-server celery worker -l INFO
+    env_file:
+      - .env
+    volumes:
+      - nautobot_media:/opt/nautobot/media
+    networks:
+      - nautobot-net
+      - clab
+    depends_on:
+      - nautobot
+
+  postgres:
+    image: postgres:15
+    container_name: nautobot-postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - nautobot_postgres_data:/var/lib/postgresql/data
+    networks:
+      - nautobot-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nautobot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: nautobot-redis
+    restart: unless-stopped
+    networks:
+      - nautobot-net
+
+volumes:
+  nautobot_media:
+  nautobot_static:
+  nautobot_postgres_data:
+    name: nautobot_postgres_data
+
+networks:
+  nautobot-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+  clab:
+    external: true
+    name: clab
