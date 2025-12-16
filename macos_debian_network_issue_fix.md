@@ -1,6 +1,3 @@
-Here's the RCA document without automation references, focused on manual human execution:
-
-```markdown
 # Root Cause Analysis: macOS to ContainerLab Network Connectivity Loss
 
 ## Issue Summary
@@ -276,4 +273,3 @@ sudo route -n add 172.29.163.0/24 192.168.139.193
 **Verify it worked:**
 ```bash
 ping 172.29.163.101
-```
